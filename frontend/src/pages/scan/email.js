@@ -22,11 +22,7 @@ export default function ScanEmail() {
     setError("");
     setResult(null);
     try {
-      const res = await axios.post(
-        "/api/scans/email",
-        { content },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.post("/api/scans/email", { content }, { headers: { Authorization: `Bearer ${token}` } });
       setResult(res.data);
     } catch (err) {
       setError(err.response?.data?.error || "Scan failed");
@@ -37,62 +33,90 @@ export default function ScanEmail() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Scan Email Content</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Scan Email Content</h1>
+        <p className="text-gray-400 mt-1">Analyze email content for phishing attempts and suspicious patterns</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 mb-6">
-        <label className="block text-sm font-medium mb-2">Paste email content</label>
+      <form onSubmit={handleSubmit} className="glass rounded-2xl p-6 mb-6">
+        <label className="block text-sm font-medium text-gray-300 mb-2">Paste email content</label>
         <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={10}
-          placeholder="Paste the full email content here including headers, body, and links..."
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-          required
+          value={content} onChange={(e) => setContent(e.target.value)}
+          rows={10} placeholder="Paste the full email content here including headers, body, and links..."
+          className="input-modern w-full font-mono text-sm resize-none" required
         />
         <div className="flex justify-between items-center mt-3">
-          <span className="text-xs text-gray-400">{content.length} characters</span>
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50 font-semibold"
-          >
-            {loading ? "Analyzing..." : "Analyze Email"}
+          <span className="text-xs text-gray-500">{content.length} characters</span>
+          <button type="submit" disabled={loading} className="btn-primary">
+            {loading ? (
+              <span className="flex items-center space-x-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span>Analyzing</span>
+              </span>
+            ) : "Analyze Email"}
           </button>
         </div>
-        {error && <div className="mt-3 bg-red-100 text-red-700 p-3 rounded text-sm">{error}</div>}
+        {error && (
+          <div className="mt-3 flex items-center space-x-2 bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm">
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
       </form>
 
       {loading && (
-        <div className="bg-white shadow rounded-lg p-6 text-center text-gray-500">
-          Analyzing email content for phishing indicators...
+        <div className="glass rounded-2xl p-8 text-center">
+          <div className="shimmer rounded-xl p-6 max-w-md mx-auto">
+            <div className="flex items-center justify-center space-x-3">
+              <svg className="animate-spin h-5 w-5 text-purple-400" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span className="text-gray-300">Analyzing email content for phishing indicators...</span>
+            </div>
+          </div>
         </div>
       )}
 
       {result && (
-        <div className="bg-white shadow rounded-lg p-6 space-y-4">
+        <div className="glass rounded-2xl p-6 space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Analysis Result</h2>
+            <h2 className="text-xl font-semibold text-white">Analysis Result</h2>
             <RiskBadge level={result.riskLevel} score={result.score} />
           </div>
 
           <div>
-            <p className="text-sm text-gray-500 mb-1">Findings:</p>
-            <ul className="list-disc pl-5 space-y-1">
+            <p className="text-sm font-medium text-gray-300 mb-2">Findings</p>
+            <div className="space-y-2">
               {result.details?.reasons?.map((r, i) => (
-                <li key={i} className="text-sm text-gray-700">{r}</li>
+                <div key={i} className="flex items-start space-x-2 text-sm text-gray-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 shrink-0"></span>
+                  <span>{r}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           {result.details?.urls?.length > 0 && (
-            <div className="border-t pt-3">
-              <p className="text-sm font-semibold mb-2">URLs Found in Email ({result.details.urlCount})</p>
+            <div className="border-t border-white/5 pt-4">
+              <p className="text-sm font-medium text-gray-300 mb-3">URLs Found ({result.details.urlCount})</p>
               <div className="space-y-2">
                 {result.details.urls.map((u, i) => (
-                  <div key={i} className="text-xs bg-gray-50 p-2 rounded">
-                    <p className="font-mono break-all">{u.url}</p>
+                  <div key={i} className="bg-white/5 rounded-xl p-3">
+                    <p className="text-sm font-mono text-gray-200 break-all">{u.url}</p>
                     {u.reasons?.length > 0 && (
-                      <p className="text-red-600 mt-1">Issues: {u.reasons.join(", ")}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {u.reasons.map((r, j) => (
+                          <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                            {r}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
                 ))}
@@ -100,16 +124,30 @@ export default function ScanEmail() {
             </div>
           )}
 
-          <div className="flex space-x-4 text-sm">
-            <span className={`px-2 py-1 rounded ${result.details?.containsSensitiveRequests ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-              {result.details?.containsSensitiveRequests ? "Requests sensitive data detected" : "No sensitive data requests"}
+          <div className="flex flex-wrap gap-3">
+            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm ${
+              result.details?.containsSensitiveRequests
+                ? "bg-red-500/10 text-red-400 border border-red-500/20"
+                : "bg-green-500/10 text-green-400 border border-green-500/20"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                result.details?.containsSensitiveRequests ? "bg-red-400" : "bg-green-400"
+              }`}></span>
+              {result.details?.containsSensitiveRequests ? "Sensitive data request detected" : "No sensitive data requests"}
             </span>
-            <span className={`px-2 py-1 rounded ${result.details?.urgencyPhrasesFound ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}`}>
+            <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-sm ${
+              result.details?.urgencyPhrasesFound
+                ? "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"
+                : "bg-green-500/10 text-green-400 border border-green-500/20"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full mr-2 ${
+                result.details?.urgencyPhrasesFound ? "bg-yellow-400" : "bg-green-400"
+              }`}></span>
               {result.details?.urgencyPhrasesFound ? "Urgency tactics detected" : "No urgency tactics"}
             </span>
           </div>
 
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-gray-500 border-t border-white/5 pt-3">
             Scanned at: {new Date(result.scannedAt).toLocaleString()}
           </div>
         </div>

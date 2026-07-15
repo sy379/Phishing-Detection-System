@@ -40,60 +40,80 @@ export default function AdminUsers() {
     }
   }
 
-  if (loading) return <div className="text-center py-10 text-gray-500">Loading users...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <svg className="animate-spin h-8 w-8 text-blue-400 mx-auto mb-4" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-gray-400">Loading users...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">User Management</h1>
+        <p className="text-gray-400 mt-1">Manage registered users</p>
+      </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium">ID</th>
-              <th className="text-left px-4 py-3 font-medium">Name</th>
-              <th className="text-left px-4 py-3 font-medium">Email</th>
-              <th className="text-left px-4 py-3 font-medium">Role</th>
-              <th className="text-left px-4 py-3 font-medium">Status</th>
-              <th className="text-left px-4 py-3 font-medium">Joined</th>
-              <th className="text-left px-4 py-3 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {users.map((u) => (
-              <tr key={u.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">{u.id}</td>
-                <td className="px-4 py-3 font-medium">{u.name}</td>
-                <td className="px-4 py-3 text-gray-600">{u.email}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    u.role === "ADMIN" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
-                  }`}>
-                    {u.role}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                    u.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}>
-                    {u.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
-                <td className="px-4 py-3">
-                  {u.isActive && u.id !== user?.id && (
-                    <button
-                      onClick={() => deactivateUser(u.id)}
-                      className="text-red-600 hover:text-red-800 text-xs font-medium"
-                    >
-                      Deactivate
-                    </button>
-                  )}
-                </td>
+      <div className="glass rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="table-modern">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td className="text-gray-400">#{u.id}</td>
+                  <td className="font-medium text-white">{u.name}</td>
+                  <td className="text-gray-300">{u.email}</td>
+                  <td>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${
+                      u.role === "ADMIN"
+                        ? "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                        : "bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                    }`}>
+                      {u.role}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${
+                      u.isActive
+                        ? "bg-green-500/10 text-green-300 border border-green-500/20"
+                        : "bg-red-500/10 text-red-300 border border-red-500/20"
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${u.isActive ? "bg-green-400" : "bg-red-400"}`}></span>
+                      {u.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="text-gray-500">{new Date(u.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    {u.isActive && u.id !== user?.id && (
+                      <button onClick={() => deactivateUser(u.id)}
+                        className="px-3 py-1.5 rounded-xl text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all">
+                        Deactivate
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

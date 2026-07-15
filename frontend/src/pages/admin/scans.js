@@ -35,17 +35,18 @@ export default function AdminScans() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">All Scans (Admin)</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">All Scans</h1>
+        <p className="text-gray-400 mt-1">Monitor all scan activities across users</p>
+      </div>
 
-      <div className="flex space-x-3 mb-4">
-        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
-          className="border rounded px-3 py-1.5 text-sm">
+      <div className="flex flex-wrap gap-3 mb-6">
+        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }} className="select-modern">
           <option value="">All Types</option>
           <option value="URL">URL</option>
           <option value="EMAIL">Email</option>
         </select>
-        <select value={riskFilter} onChange={(e) => { setRiskFilter(e.target.value); setPage(1); }}
-          className="border rounded px-3 py-1.5 text-sm">
+        <select value={riskFilter} onChange={(e) => { setRiskFilter(e.target.value); setPage(1); }} className="select-modern">
           <option value="">All Risk Levels</option>
           <option value="SAFE">Safe</option>
           <option value="LOW">Low</option>
@@ -55,52 +56,62 @@ export default function AdminScans() {
         </select>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium">ID</th>
-              <th className="text-left px-4 py-3 font-medium">User</th>
-              <th className="text-left px-4 py-3 font-medium">Type</th>
-              <th className="text-left px-4 py-3 font-medium">Input</th>
-              <th className="text-left px-4 py-3 font-medium">Risk</th>
-              <th className="text-left px-4 py-3 font-medium">Date</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {data?.scans?.length > 0 ? (
-              data.scans.map((scan) => (
-                <tr key={scan.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-gray-500">{scan.id}</td>
-                  <td className="px-4 py-3">{scan.user?.name || "Unknown"}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      scan.type === "URL" ? "bg-purple-100 text-purple-700" : "bg-cyan-100 text-cyan-700"
-                    }`}>
-                      {scan.type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 max-w-xs truncate">{scan.input}</td>
-                  <td className="px-4 py-3"><RiskBadge level={scan.riskLevel} score={scan.score} /></td>
-                  <td className="px-4 py-3 text-gray-500">{new Date(scan.scannedAt).toLocaleString()}</td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan={6} className="px-4 py-6 text-center text-gray-400">No scans found</td></tr>
-            )}
-          </tbody>
-        </table>
+      <div className="glass rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="table-modern">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Type</th>
+                <th>Input</th>
+                <th>Risk</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.scans?.length > 0 ? (
+                data.scans.map((scan) => (
+                  <tr key={scan.id}>
+                    <td className="text-gray-400">#{scan.id}</td>
+                    <td className="text-gray-300">{scan.user?.name || "Unknown"}</td>
+                    <td>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${
+                        scan.type === "URL"
+                          ? "bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                          : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                      }`}>
+                        {scan.type}
+                      </span>
+                    </td>
+                    <td className="max-w-xs truncate text-gray-300">{scan.input}</td>
+                    <td><RiskBadge level={scan.riskLevel} score={scan.score} /></td>
+                    <td className="text-gray-500">{new Date(scan.scannedAt).toLocaleString()}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={6} className="text-center text-gray-500 py-8">No scans found</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {data && data.totalPages > 1 && (
-        <div className="flex justify-center space-x-2 mt-4">
-          <button onClick={() => setPage(Math.max(1, page - 1))}
-            disabled={page === 1}
-            className="px-3 py-1 border rounded text-sm disabled:opacity-50">Previous</button>
-          <span className="px-3 py-1 text-sm text-gray-500">Page {page} of {data.totalPages}</span>
-          <button onClick={() => setPage(Math.min(data.totalPages, page + 1))}
-            disabled={page === data.totalPages}
-            className="px-3 py-1 border rounded text-sm disabled:opacity-50">Next</button>
+        <div className="flex items-center justify-center space-x-4 mt-6">
+          <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              page === 1 ? "bg-white/5 text-gray-500 cursor-not-allowed" : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}>
+            Previous
+          </button>
+          <span className="text-sm text-gray-400">Page {page} of {data.totalPages}</span>
+          <button onClick={() => setPage(Math.min(data.totalPages, page + 1))} disabled={page === data.totalPages}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              page === data.totalPages ? "bg-white/5 text-gray-500 cursor-not-allowed" : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}>
+            Next
+          </button>
         </div>
       )}
     </div>
